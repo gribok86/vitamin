@@ -1,5 +1,3 @@
-
-
 from fastapi import FastAPI
 import uvicorn
 
@@ -20,10 +18,15 @@ def add_vitamins(vitamins: str | None = None):
     vitamins_list = [vitamin.strip(",") for vitamin in vitamins.split()]
     vitamins_clean = [v for v in vitamins_list if v]
 
-    # 3. Валидация: проверяем КАЖДЫЙ витамин в списке
+    # 3. Новая валидация: разрешаем только буквы, цифры и дефис
     for vitamin in vitamins_clean:
-        if not vitamin.isalpha():
-            # Если хотя бы ОДИН элемент содержит цифры или знаки, сразу прерываемся
+        # Проверяем каждый символ в названии витамина
+        # c.isalnum() проверяет, является ли символ буквой или цифрой
+        # c == "-" проверяет, является ли символ тире
+        is_valid = all(c.isalnum() or c == "-" for c in vitamin)
+        
+        if not is_valid:
+            # Если нашли запрещенный символ (например, $, @, +, =), возвращаем ошибку
             return {"Error": "Не балуйся"}
 
     # 4. Если всё успешно прошли, увеличиваем счетчик и пишем в историю
